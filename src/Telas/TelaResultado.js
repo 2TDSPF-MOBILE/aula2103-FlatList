@@ -1,12 +1,13 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { StyleSheet, ImageBackground,FlatList, Dimensions, TouchableOpacity,View,TextInput,Image} from 'react-native';
-import {Ionicons} from 'react-native-vector-icons'
+import { Text,StyleSheet, ImageBackground, FlatList, Dimensions, TouchableOpacity, View, TextInput } from 'react-native';
+import { Ionicons } from 'react-native-vector-icons'
+import { Image } from 'expo-image';
 
 import API_KEY from '../API_KEY';
 import axios from 'axios';
-
-const{width,height}=Dimensions.get("window")
+import Cabecalho from '../Components/Cabecalho';
+const { width, height } = Dimensions.get("window")
 const IMAGE_WIDTH = width
 
 
@@ -26,7 +27,7 @@ export default function TelaResultado({ route, navigation }) {
           q: text
         }
       })
-      
+
       setDados(resultado.data.data)
     } catch (err) {
       console.log(err)
@@ -38,39 +39,30 @@ export default function TelaResultado({ route, navigation }) {
       source={require('../../assets/BG.png')}
       style={styles.container}
     >
-       <View style={styles.cabecalho}>
-        <Ionicons
-          name="chevron-back"
-          size={40}
-          color="white"
-          onPress={() => navigation.goBack()}
-        />
-        <TextInput
-          style={styles.textInput}
-          placeholder='Digite sua pesquisa'
-          autoCapitalize='none'
-          autoCorrect={false}
-          value={text}
-          onChangeText={(value) => setText(value)}
-        />
-        <Ionicons
-          name="search"
-          size={40}
-          color='white'
-          onPress={() => solicitarDados(text)}
-        />
-      </View>
-    
-     
+      <Cabecalho 
+        text={text}
+        setText={setText}
+        navigation={navigation}
+        solicitarDados={solicitarDados}
+      />     
+
+
       <FlatList
         data={dados}
         numColumns={2}
+        ListHeaderComponent={
+          <View style={styles.headerContainer}>
+            <Ionicons name="arrow-up" size={40} color="white"/>
+            <Text style={styles.headerText}>Digite o que você procura...</Text>
+          </View>
+        }
         renderItem={({ item }) => {
           return (
+            <TouchableOpacity onPress={()=>navigation.navigate("TelaDetalhes",{item:item})}>
               <Image
                 style={styles.image}
-                source={{ uri: item.images.preview_gif.url }} />            
-             
+                source={{ uri: item.images.preview_gif.url }} /> 
+            </TouchableOpacity>
 
           )
         }}
@@ -86,29 +78,18 @@ const styles = StyleSheet.create({
     flex: 1
   },
   image: {
-    width: IMAGE_WIDTH/2,
-    height: IMAGE_WIDTH/2
+    width: IMAGE_WIDTH / 2.3,
+    height: IMAGE_WIDTH / 2.3,
+    margin:IMAGE_WIDTH * 0.03,
+    borderRadius:10
   },
-  cabecalho: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 30
+  headerContainer:{
+    alignItems:"center",
+    margin:20
   },
-  textInput: {
-    flex: 1,
-    backgroundColor: "white",
-    borderRadius: 10,
-    paddingLeft: 10
-  },
-  cabecalho: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      marginTop: 30
-    },
-    textInput: {
-      flex: 1,
-      backgroundColor: "white",
-      borderRadius: 10,
-      paddingLeft: 10
-    }
+  headerText:{
+    fontSize:16,
+    color:"white",
+    textAlign:'center'
+  }
 });
