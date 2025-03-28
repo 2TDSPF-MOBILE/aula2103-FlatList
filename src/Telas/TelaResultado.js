@@ -1,8 +1,10 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { Text,StyleSheet, ImageBackground, FlatList, Dimensions, TouchableOpacity, View, TextInput } from 'react-native';
+import { Text, StyleSheet, ImageBackground, FlatList, Dimensions, TouchableOpacity, View, TextInput,Keyboard } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons'
 import { Image } from 'expo-image';
+import TextoInfo from '../Components/TextoInfo';
+import Loading from '../Components/Loading';
 
 import API_KEY from '../API_KEY';
 import axios from 'axios';
@@ -17,9 +19,12 @@ export default function TelaResultado({ route, navigation }) {
 
   const [text, setText] = useState('')
   const [dados, setDados] = useState([])
-
+  const [showMessage,setShowMessage]=useState(true)
+  const [isLoading,setIsLoading]=useState(false)
 
   const solicitarDados = async (text) => {
+    Keyboard.dismiss()
+    setIsLoading(true)
     try {
       const resultado = await axios.get(link, {
         params: {
@@ -27,11 +32,13 @@ export default function TelaResultado({ route, navigation }) {
           q: text
         }
       })
-
+      setShowMessage(false)
+      setIsLoading(false)
       setDados(resultado.data.data)
     } catch (err) {
       console.log(err)
     }
+    
   }
 
   return (
@@ -51,10 +58,10 @@ export default function TelaResultado({ route, navigation }) {
         data={dados}
         numColumns={2}
         ListHeaderComponent={
-          <View style={styles.headerContainer}>
-            <Ionicons name="arrow-up" size={40} color="white"/>
-            <Text style={styles.headerText}>Digite o que você procura...</Text>
-          </View>
+          <>
+            <Loading isLoading={isLoading}/>
+            <TextoInfo showMessage={showMessage}/>
+          </>
         }
         renderItem={({ item }) => {
           return (
@@ -82,14 +89,5 @@ const styles = StyleSheet.create({
     height: IMAGE_WIDTH / 2.3,
     margin:IMAGE_WIDTH * 0.03,
     borderRadius:10
-  },
-  headerContainer:{
-    alignItems:"center",
-    margin:20
-  },
-  headerText:{
-    fontSize:16,
-    color:"white",
-    textAlign:'center'
   }
 });
