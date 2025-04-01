@@ -1,10 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { Text, StyleSheet, ImageBackground, FlatList, Dimensions, TouchableOpacity, View, TextInput,Keyboard } from 'react-native';
+import { Alert,Text, StyleSheet, ImageBackground, FlatList, Dimensions, TouchableOpacity, View, TextInput,Keyboard } from 'react-native';
 import { Ionicons } from 'react-native-vector-icons'
 import { Image } from 'expo-image';
 import TextoInfo from '../Components/TextoInfo';
 import Loading from '../Components/Loading';
+import Error from '../Components/Error';
 
 import API_KEY from '../API_KEY';
 import axios from 'axios';
@@ -21,6 +22,7 @@ export default function TelaResultado({ route, navigation }) {
   const [dados, setDados] = useState([])
   const [showMessage,setShowMessage]=useState(true)
   const [isLoading,setIsLoading]=useState(false)
+  const[showError,setShowError] = useState(false)
 
   const solicitarDados = async (text) => {
     Keyboard.dismiss()
@@ -36,7 +38,11 @@ export default function TelaResultado({ route, navigation }) {
       setIsLoading(false)
       setDados(resultado.data.data)
     } catch (err) {
+      setIsLoading(false)
+      setShowMessage(false)
+      setShowError(true)
       console.log(err)
+      Alert.alert("Alerta","Estamos com error")
     }
     
   }
@@ -61,6 +67,7 @@ export default function TelaResultado({ route, navigation }) {
           <>
             <Loading isLoading={isLoading}/>
             <TextoInfo showMessage={showMessage}/>
+            <Error showError={showError}/>
           </>
         }
         renderItem={({ item }) => {
